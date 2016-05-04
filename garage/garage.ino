@@ -33,18 +33,18 @@ const unsigned int sirenDuration = 10000; // 10 Seconds
 
 // Pins Setup
 const int sirenPin = 2;
-const int door1SensorPin = 4;
-const int door2SensorPin = 5;
+const int door1SensorPin = 5; // My garage door
+const int door2SensorPin = 4; // My wife's garage door
 
 const int relay1Pin = 6;
 const int relay2Pin = 7;
-const int relayTimeDelay = 1000; // delay in ms for on and off phases
+const int relayTimeDelay = 10000; // delay in ms for on and off phases
 
 boolean sirenState = false;
 boolean door1SensorState = false;
 boolean door2SensorState = false;
 long previousMillis = 0;
-long interval = 60*1000; // 1 minute interval to wait before we can ring the siren again.
+long interval = 2*60*1000; // 2 minute interval to wait before we can ring the siren again.
 
 LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 
@@ -76,8 +76,20 @@ void displayDate(){
   lcd.setCursor(0,1);
   String alarmString = "ALARM: " + String(triggerHour-12) + ":" + String(triggerMinute) + " " + triggerAMPM;
   lcd.print(alarmString);
+}
+
+void displayDoorStatus(){
+
+  lcd.clear();
   
-  //Serial.print(alarmString);
+  String door1Status = (door1SensorState) ? "OPEN" : "CLOSED";
+  String door2Status = (door2SensorState) ? "OPEN" : "CLOSED";
+  
+  lcd.setCursor(0,0);
+  lcd.print("DOOR #1 IS " + door1Status);
+
+  lcd.setCursor(0,1);
+  lcd.print("DOOR #2 IS " + door2Status);
 }
 
 void checkSensorState() {
@@ -122,11 +134,17 @@ void checkGarageStatus() {
 
           // Turn Siren ON
           triggerSiren();
+
+          // Change the display to show which door is opened or closed
+          displayDoorStatus();
           
           delay(sirenDuration);
 
           // Turn Siren OFF
           triggerSiren();
+
+          // Clear the LCD to get it ready to display the date/time again.
+          lcd.clear();
         }
     }
   }
