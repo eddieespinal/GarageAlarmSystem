@@ -74,22 +74,30 @@ void displayDate(){
   lcd.print(clock.dateFormat("m/d/y h:iA", dt));
 
   lcd.setCursor(0,1);
-  String alarmString = "ALARM: " + String(triggerHour-12) + ":" + String(triggerMinute) + " " + triggerAMPM;
-  lcd.print(alarmString);
+
+  // Display the door status on the LCD if we detect one of the doors opened.
+  if (door1SensorState == true || door2SensorState == true) {
+    String door1Status = (door1SensorState) ? "OPN" : "CLD";
+    String door2Status = (door2SensorState) ? "OPN" : "CLD";
+    lcd.print("D1:" + door1Status + "    D2:" + door2Status);
+  } else {
+    String alarmString = "ALARM: " + String(triggerHour-12) + ":" + String(triggerMinute) + " " + triggerAMPM + " ";
+    lcd.print(alarmString);
+  }
 }
 
 void displayDoorStatus(){
 
   lcd.clear();
   
-  String door1Status = (door1SensorState) ? "OPEN" : "CLOSED";
-  String door2Status = (door2SensorState) ? "OPEN" : "CLOSED";
+  String door1Status = (door1SensorState) ? "OPN" : "CLD";
+  String door2Status = (door2SensorState) ? "OPN" : "CLD";
   
   lcd.setCursor(0,0);
-  lcd.print("DOOR #1 IS " + door1Status);
+  lcd.print("WARNING CHK DOOR");
 
   lcd.setCursor(0,1);
-  lcd.print("DOOR #2 IS " + door2Status);
+  lcd.print("D1:" + door1Status + "    D2:" + door2Status);
 }
 
 void checkSensorState() {
